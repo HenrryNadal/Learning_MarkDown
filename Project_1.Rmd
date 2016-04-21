@@ -20,7 +20,7 @@ library(sqldf)
 
 ```{r temp, echo=TRUE, warning=FALSE}
 temp <- tempfile()
-download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", temp)
+download.file("https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip", temp, method="curl")
 contain<-unz(temp, "activity.csv")
 Data<-read.csv(contain)
 Data$steps<-as.numeric(Data$steps)
@@ -101,38 +101,39 @@ sum(is.na(Data$steps))
 Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
 ```{r Replacing_NAs, echo=TRUE, message=FALSE, warning=FALSE}
-
+##We'll calculate limit that's the number of NA's in Data and DataNa that's a logical vector 
 limit<-sum(is.na(Data$steps))
 DataNA<-is.na(Data$steps)
 
-
+#We'll implement a loop to change NA's for the mean for that 5-minute interval
 for (i in 1:limit){
+        # First we'll check the 5-minute interval for each NA
+        IntervalNA<-Data[DataNA,3][i]
         
+        # Then we'll create a logical vector with true in the Step_day_inter's 
+        # index where the IntervalNA is located
+        Index<-IntervalNA==Step_day_inter$interval
         
-        Data[DataNA,c(1,2,3)][1,]
+        # Now we'll extract the mean value for that IntervalNA
+        ToNa<-Step_day_inter[Index,2]
         
-        
-        Step_day_inter[Data[is.na(Data$steps),3][2]==Step_day_inter$interval, ][,2] 
+        # To finish we'll asign this value to the NA
+        Data[DataNA,1][i]<-ToNa
         }
-
-             
-             
-             ##Value to assign#######################################################
-             Step_day_inter[Data[is.na(Data$steps),3][1152]==Step_day_inter$interval, ][,2]
-        
-             #######################################################################
-             
-             
-             
-        ##if(Data[is.na(Data$steps), ][i,"interval"]==1)
-       
-#        is.na(Data$steps)
 ```
 
 
 Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
+```{r Data_With_No_NAs, echo=TRUE, message=FALSE, warning=FALSE}
+head(Data)
+```
+
+
 Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+
+
 
 
 ##Are there differences in activity patterns between weekdays and weekends?
@@ -140,15 +141,11 @@ Make a histogram of the total number of steps taken each day and Calculate and r
 
 For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
 
-Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+Create a new factor variable in the dataset with two levels ??? ???weekday??? and ???weekend??? indicating whether a given date is a weekday or weekend day.
 
 Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data
 
 ##END
-
-
-
-
 
 
 
